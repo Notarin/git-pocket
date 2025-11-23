@@ -8,5 +8,6 @@ writeScriptBin "git-pocket" (let
   script = builtins.readFile ./git-pocket.nu;
 in ''
   ${shebang}
+
   ${script}
 '')
