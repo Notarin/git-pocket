@@ -43,3 +43,12 @@ def "main list" []: nothing -> string {
   let pockets: table<name: string, hash: string> = $pocket_refs | each {|row| {name: ($row.ref_path | str replace -r '^refs/pockets/' '') hash: $row.hash} };
   $pockets | each {|pocket| $"($pocket.name) ($pocket.hash)" } | str join "\n"
 }
+
+# Applies a pocket to the worktree, leaving the pocket intact.
+@example "Applies the pocket named my-pocket to the worktree" { git pocket apply my-pocket }
+def "main apply" [
+    pocket_name: string # The name of the pocket to apply to the worktree
+]: nothing -> nothing {
+    git read-tree -mu HEAD $"refs/pockets/($pocket_name)";
+    print $"Applied pocket '($pocket_name)' to the worktree."
+}
