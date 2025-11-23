@@ -1,13 +1,13 @@
 # This command doesn't do anything yet.
 #
-# This command will likely just be an alias for the `pocket` subcommand in the future.
+# This command will likely just be an alias for the `new` subcommand in the future.
 def main []: nothing -> nothing {
   print "Nothing to see here yet!"
 }
 
 # Add the staged changes to a new pocket.
-@example "Creates a pocket named my-new-pocket" { git pocket my-new-pocket }
-def "main pocket" [
+@example "Creates a pocket named my-new-pocket" { git pocket new my-new-pocket }
+def "main new" [
   pocket_name: string # The name of the pocket to create
   --force (-f) # Whether to overwrite pre-existing pockets
 ]: nothing -> nothing {
