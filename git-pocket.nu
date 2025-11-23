@@ -7,9 +7,17 @@
 #
 # Running `git pocket` without any subcommands will default to the `new` subcommand.
 def main [
-  pocket_name: string # The name of the pocket to create
+  pocket_name?: string # The name of the pocket to create
   --force (-f) # Whether to overwrite pre-existing pockets
 ]: nothing -> nothing {
+  if $pocket_name == null {
+    # The command was plainly run, best to show help.
+    # Though it isn't easy, as we don't have a direct way to run the --help flag here.
+    print "No subcommand provided, nor pocket name. Are you looking for help?";
+    print "Due to the way git expects subcommands to work, `git pocket --help` will not run the underlying help command.";
+    print "Instead try `git-pocket --help`.";
+    return;
+  }
   # Really not a fan of what I had to do here.
   # While a spread arg exists, I can take one, but I cant call `main new` with it.
   if $force {
