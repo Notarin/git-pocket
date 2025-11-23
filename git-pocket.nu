@@ -33,3 +33,13 @@ def check_if_pocket_exists [
   let refs: table<hash: string, ref_path: string> = git show-ref | parse "{hash} {ref_path}";
   ($refs | where ref_path == $"refs/pockets/($pocket_name)" | length) > 0
 }
+
+# Lists existing pockets.
+@example "Lists all existing pockets" { git pocket list }
+def "main list" []: nothing -> string {
+  let refs: table<hash: string, ref_path: string> = git show-ref | parse "{hash} {ref_path}";
+  let pocket_refs: table<hash: string, ref_path: string> = $refs | where ref_path =~ "^refs/pockets/.*";
+
+  let pockets: table<name: string, hash: string> = $pocket_refs | each {|row| {name: ($row.ref_path | str replace -r '^refs/pockets/' '') hash: $row.hash} };
+  $pockets | each {|pocket| $"($pocket.name) ($pocket.hash)" } | str join "\n"
+}
