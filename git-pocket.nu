@@ -47,8 +47,18 @@ def "main list" []: nothing -> string {
 # Applies a pocket to the worktree, leaving the pocket intact.
 @example "Applies the pocket named my-pocket to the worktree" { git pocket apply my-pocket }
 def "main apply" [
-    pocket_name: string # The name of the pocket to apply to the worktree
+  pocket_name: string # The name of the pocket to apply to the worktree
 ]: nothing -> nothing {
-    git read-tree -mu HEAD $"refs/pockets/($pocket_name)";
-    print $"Applied pocket '($pocket_name)' to the worktree."
+  git read-tree -mu HEAD $"refs/pockets/($pocket_name)";
+  print $"Applied pocket '($pocket_name)' to the worktree."
+}
+
+# Applies a pocket to the worktree and deletes the pocket.
+@example "Applies and deletes the pocket named my-pocket" { git pocket pop my-pocket }
+def "main pop" [
+  pocket_name: string # The name of the pocket to apply to the worktree and delete
+]: nothing -> nothing {
+  git read-tree -mu HEAD $"refs/pockets/($pocket_name)";
+  git update-ref -d $"refs/pockets/($pocket_name)";
+  print $"Applied and deleted pocket '($pocket_name)'."
 }
