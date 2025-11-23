@@ -1,6 +1,9 @@
-# This command doesn't do anything yet.
+# Manage git pockets.
 #
-# This command will likely just be an alias for the `new` subcommand in the future.
+# Pockets are similar to git stashes.
+# Where they differ is that pockets are much simpler, missing features like stage/unstaged differentiation, long messages, etc.
+# While stashes require multiple commits as well as reflog support under the hood, pockets simply use what little they need.
+# Instead of using commits objects, or even several of them for that matter, a pocket is just simply a fraction of a commit, a tree object, as well as a ref pointing to it for future use.
 def main []: nothing -> nothing {
   print "Nothing to see here yet!"
 }
