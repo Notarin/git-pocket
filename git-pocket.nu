@@ -62,3 +62,12 @@ def "main pop" [
   git update-ref -d $"refs/pockets/($pocket_name)";
   print $"Applied and deleted pocket '($pocket_name)'."
 }
+
+# Delete a pocket.
+@example "Deletes the pocket named my-pocket" { git pocket remove my-pocket }
+def "main remove" [
+  pocket_name: string # The name of the pocket to delete
+]: nothing -> nothing {
+  git update-ref -d $"refs/pockets/($pocket_name)";
+  print $"Deleted pocket '($pocket_name)'."
+}
