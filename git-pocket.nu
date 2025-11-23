@@ -4,8 +4,19 @@
 # Where they differ is that pockets are much simpler, missing features like stage/unstaged differentiation, long messages, etc.
 # While stashes require multiple commits as well as reflog support under the hood, pockets simply use what little they need.
 # Instead of using commits objects, or even several of them for that matter, a pocket is just simply a fraction of a commit, a tree object, as well as a ref pointing to it for future use.
-def main []: nothing -> nothing {
-  print "Nothing to see here yet!"
+#
+# Running `git pocket` without any subcommands will default to the `new` subcommand.
+def main [
+  pocket_name: string # The name of the pocket to create
+  --force (-f) # Whether to overwrite pre-existing pockets
+]: nothing -> nothing {
+  # Really not a fan of what I had to do here.
+  # While a spread arg exists, I can take one, but I cant call `main new` with it.
+  if $force {
+    git pocket new $pocket_name --force
+  } else {
+    git pocket new $pocket_name
+  }
 }
 
 # Add the staged changes to a new pocket.
