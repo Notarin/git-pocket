@@ -3,7 +3,7 @@
 # Pockets are similar to git stashes.
 # Where they differ is that pockets are much simpler, missing features like stage/unstaged differentiation, long messages, etc.
 # While stashes require multiple commits as well as reflog support under the hood, pockets simply use what little they need.
-# Instead of using commits objects, or even several of them for that matter, a pocket is just simply a fraction of a commit, a tree object, as well as a ref pointing to it for future use.
+# Instead of using up to three commits objects and abusing the reflog like stashes, a pocket is just simply a single commit object, as well as a ref pointing to it for identification.
 #
 # Running `git pocket` without any subcommands will default to the `new` subcommand.
 def main [
@@ -43,9 +43,21 @@ def "main new" [
       help: "If you're sure you want to overwrite it, try the --force flag."
     }
   }
-  let treehash: string = git write-tree;
-  git update-ref $"refs/pockets/($pocket_name)" $treehash;
-  print $"Pocket '($pocket_name)' created at ($treehash)";
+  # Check if anything is actually staged to pocket.
+  if (git diff --staged | length) == 0 {
+    print "No staged changes to pocket.";
+    exit 1;
+  }
+  let tree_hash: string = git write-tree;
+  # When making the commit, we give it a message that is just the pocket name again.
+  # For right now, this is just a slightly useful placeholder, as giving it an empty message is not allowed,
+  # and the work it would take to figure out giving it an empty message is not worth it when naming it the same thing as the pocket may be useful.
+  # Of course this is subject to change. AAMOF, it will likely be very soon that a custom message flag is implemented.
+  let commit_hash: string = git commit-tree $tree_hash -p HEAD -m $"Pocket '($pocket_name)'";
+  git update-ref $"refs/pockets/($pocket_name)" $commit_hash;
+  # Revert the staged changes, as they are now pocketed.
+  git show $"refs/pockets/($pocket_name)" | git apply -R --index;
+  print $"Pocket '($pocket_name)' created at ($commit_hash)";
 }
 
 # Check if a pocket already exists.
@@ -71,7 +83,7 @@ def "main list" []: nothing -> string {
 def "main apply" [
   pocket_name: string # The name of the pocket to apply to the worktree
 ]: nothing -> nothing {
-  git read-tree -mu HEAD $"refs/pockets/($pocket_name)";
+  git show $"refs/pockets/($pocket_name)" | git apply;
   print $"Applied pocket '($pocket_name)' to the worktree."
 }
 
@@ -80,7 +92,7 @@ def "main apply" [
 def "main pop" [
   pocket_name: string # The name of the pocket to apply to the worktree and delete
 ]: nothing -> nothing {
-  git read-tree -mu HEAD $"refs/pockets/($pocket_name)";
+  git show $"refs/pockets/($pocket_name)" | git apply;
   git update-ref -d $"refs/pockets/($pocket_name)";
   print $"Applied and deleted pocket '($pocket_name)'."
 }
